@@ -21,13 +21,19 @@ def process_game_events(event, mouse_x, mouse_y, left_grid_x,left_grid_y, right_
                         , ships_to_place, player_turn, game_phase):
     # клик на сетку игрока
     if event.type == pygame.MOUSEBUTTONDOWN:
-        if game_phase == 'placing' and all(count == 0 for count in ships_to_place.values()) and (SCREEN_WIDTH // 2 - 150 <= mouse_x <= SCREEN_WIDTH // 2 + 150) and (50 <= mouse_y <= 90):
-            game_phase = 'battle'
-            click_sound.play()
-            return is_dragging, start_cell, current_cells,  player_turn
+        # Клик по кнопке "Случайная расстановка"
         if (50 <= mouse_x <= 350) and (50 <= mouse_y <= 90):
             if not all(count == 0 for count in ships_to_place.values()):
                 generate_random_ships(player_grid, ships_to_place)
+                print("Корабли переставлены!")
+        if (game_phase == "placing"
+                and all(count == 0 for count in ships_to_place.values())
+                and event.type == pygame.MOUSEBUTTONDOWN
+                and (SCREEN_WIDTH // 2 - 150 <= mouse_x <= SCREEN_WIDTH // 2 + 150)
+                and (50 <= mouse_y <= 90)):
+            game_phase = "battle"  # Переход в фазу боя
+            click_sound.play()
+            return is_dragging, start_cell, current_cells, player_turn, game_phase
 
         if event.button == 1:  # Левый клик
             cell = get_cell(mouse_x, mouse_y, left_grid_x, left_grid_y, grid_size, cell_size)
@@ -37,12 +43,18 @@ def process_game_events(event, mouse_x, mouse_y, left_grid_x,left_grid_y, right_
                 current_cells = [cell]
             else:
                 cell = get_cell(mouse_x, mouse_y, right_grid_x, right_grid_y, grid_size, cell_size)
-                if cell and all(count == 0 for count in ships_to_place.values()) and player_turn:
+                if cell and game_phase == "battle" and player_turn:
                     if computer_grid[cell[0]][cell[1]] in (0, 1):
-                        hit = process_shot(computer_grid, cell, right_grid_x, right_grid_y, cell_size)
+                        hit = process_shot(
+                            computer_grid,
+                            cell,
+                            right_grid_x,  # передаем координаты сетки компьютера
+                            right_grid_y,
+                            cell_size  # из параметров функции
+                        )
                         player_turn = hit
                         if not hit:
-                            return is_dragging, start_cell, current_cells, False
+                            return is_dragging, start_cell, current_cells, False, game_phase
                         # computer_cell = computer_turn(player_grid)
                         # if computer_cell:
                         #     process_shot(player_grid, computer_cell)
