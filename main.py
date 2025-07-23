@@ -32,6 +32,8 @@ def main():
     player_grid = init_player_grid(grid_size)
     computer_grid = generate_computer_ships(grid_size)
 
+    show_enemy_ships = False
+
     in_menu = True
     running = True
     player_turn = True
@@ -51,10 +53,11 @@ def main():
                 in_menu = process_menu_events(event, mouse_x, mouse_y, in_menu)
 
             else:
-                is_dragging, start_cell, current_cells, player_turn, game_phase = process_game_events(
+                is_dragging, start_cell, current_cells, player_turn, game_phase, show_enemy_ships = process_game_events(
                     event, mouse_x, mouse_y, left_grid_x, left_grid_y, right_grid_x,
                     right_grid_y, grid_size, cell_size, player_grid, computer_grid,
-                    current_cells, is_dragging, start_cell, SHIPS_TO_PLACE, player_turn, game_phase)
+                    current_cells, is_dragging, start_cell, SHIPS_TO_PLACE, player_turn
+                    , game_phase, show_enemy_ships)
                 if not player_turn:
                     computer_turn_timer = current_time + computer_turn_delay
                     computer_move_ready = False
@@ -76,7 +79,7 @@ def main():
             render_game(screen, left_grid_x, left_grid_y, right_grid_x,
                         right_grid_y, grid_size, cell_size, player_grid,
                         computer_grid, current_cells, SHIPS_TO_PLACE,
-                        shot_animations, game_phase)
+                        shot_animations, game_phase, show_enemy_ships)
             shot_animations[:] = [a for a in shot_animations if a.active]
 
             # if all(count==0 for count in SHIPS_TO_PLACE.values()) and game_phase == 'placing':

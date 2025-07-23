@@ -18,7 +18,7 @@ def process_menu_events(event, mouse_x, mouse_y, in_menu):
 
 def process_game_events(event, mouse_x, mouse_y, left_grid_x,left_grid_y, right_grid_x, right_grid_y, grid_size,
                         cell_size,player_grid, computer_grid, current_cells, is_dragging, start_cell
-                        , ships_to_place, player_turn, game_phase):
+                        , ships_to_place, player_turn, game_phase, show_enemy_ships):
     # клик на сетку игрока
     if event.type == pygame.MOUSEBUTTONDOWN:
         # Клик по кнопке "Случайная расстановка"
@@ -26,6 +26,12 @@ def process_game_events(event, mouse_x, mouse_y, left_grid_x,left_grid_y, right_
             if not all(count == 0 for count in ships_to_place.values()):
                 generate_random_ships(player_grid, ships_to_place)
                 print("Корабли переставлены!")
+
+        if (SCREEN_WIDTH - 250 <= mouse_x <= SCREEN_WIDTH - 50) and (50 <= mouse_y <= 90):
+            show_enemy_ships = not show_enemy_ships
+            click_sound.play()
+            print("Показ кораблей противника:", show_enemy_ships)
+
         if (game_phase == "placing"
                 and all(count == 0 for count in ships_to_place.values())
                 and event.type == pygame.MOUSEBUTTONDOWN
@@ -33,7 +39,7 @@ def process_game_events(event, mouse_x, mouse_y, left_grid_x,left_grid_y, right_
                 and (50 <= mouse_y <= 90)):
             game_phase = "battle"  # Переход в фазу боя
             click_sound.play()
-            return is_dragging, start_cell, current_cells, player_turn, game_phase
+            return is_dragging, start_cell, current_cells, player_turn, game_phase, show_enemy_ships
 
         if event.button == 1:  # Левый клик
             cell = get_cell(mouse_x, mouse_y, left_grid_x, left_grid_y, grid_size, cell_size)
@@ -54,13 +60,13 @@ def process_game_events(event, mouse_x, mouse_y, left_grid_x,left_grid_y, right_
                         )
                         player_turn = hit
                         if not hit:
-                            return is_dragging, start_cell, current_cells, False, game_phase
+                            return is_dragging, start_cell, current_cells, False, game_phase, show_enemy_ships
                         # computer_cell = computer_turn(player_grid)
                         # if computer_cell:
                         #     process_shot(player_grid, computer_cell)
         elif event.button == 3:  # Правый клик - удаление корабля
             if game_phase != 'placing':
-                return is_dragging, start_cell, current_cells, player_turn, game_phase
+                return is_dragging, start_cell, current_cells, player_turn, game_phase, show_enemy_ships
             cell = get_cell(mouse_x, mouse_y, left_grid_x, left_grid_y, grid_size, cell_size)
             if cell:
                 row, col = cell
@@ -129,4 +135,4 @@ def process_game_events(event, mouse_x, mouse_y, left_grid_x,left_grid_y, right_
             is_dragging = False
             start_cell = None
             current_cells = []
-    return is_dragging, start_cell, current_cells, player_turn, game_phase
+    return is_dragging, start_cell, current_cells, player_turn, game_phase, show_enemy_ships

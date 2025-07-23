@@ -15,13 +15,14 @@ def draw_ships_list(screen, ships_to_place, position):
         y += line_height
 
 def render_game(screen, left_grid_x, left_grid_y, right_grid_x, right_grid_y,grid_size,
-                cell_size, player_grid, computer_grid, current_cells, ships_to_place, animations, game_phase):
+                cell_size, player_grid, computer_grid, current_cells, ships_to_place,
+                animations, game_phase, show_enemy_ships):
     # здесь позже будет игровая логикa
     # Рисуем сетки
     draw_grid(screen, left_grid_x, left_grid_y, grid_size=10, player="Игрок")
     draw_grid(screen, right_grid_x, right_grid_y, grid_size=10, player="Компьютер")
-    draw_ships(screen, player_grid, left_grid_x, left_grid_y, grid_size, cell_size)
-    draw_ships(screen, computer_grid, right_grid_x, right_grid_y, grid_size, cell_size)
+    draw_ships(screen, player_grid, left_grid_x, left_grid_y, grid_size, cell_size, show_ships=True)
+    draw_ships(screen, computer_grid, right_grid_x, right_grid_y, grid_size, cell_size, show_ships=show_enemy_ships)
     draw_ships_list(screen, ships_to_place, (left_grid_x, left_grid_y + grid_size * cell_size + 20))
 
     intersect = any(player_grid[r][c] == 1 for (r, c) in current_cells)
@@ -53,6 +54,15 @@ def render_game(screen, left_grid_x, left_grid_y, right_grid_x, right_grid_y,gri
         font = pygame.font.Font(None, 36)
         text = font.render('Начать бой!', True, (255, 255, 255))
         screen.blit(text, (btn_rect.x + 10, btn_rect.y + 5))
+
+    # Кнопка "Показать/Скрыть корабли"
+    toggle_btn_rect = pygame.Rect(SCREEN_WIDTH - 250, 50, 200, 40)
+    mouse_pos = pygame.mouse.get_pos()
+    toggle_color = (200, 100, 100) if show_enemy_ships else (100, 100, 200)
+    pygame.draw.rect(screen, toggle_color, toggle_btn_rect)
+    font = pygame.font.Font(None, 30)
+    toggle_text = font.render('Скрыть' if show_enemy_ships else 'Показать', True, (255, 255, 255))
+    screen.blit(toggle_text, (toggle_btn_rect.x + 30, toggle_btn_rect.y + 8))
 
     # подсвечиваем current_cells
     for (r, c) in current_cells:
