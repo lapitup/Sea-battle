@@ -51,7 +51,7 @@ def main():
                 in_menu = process_menu_events(event, mouse_x, mouse_y, in_menu)
 
             else:
-                is_dragging, start_cell, current_cells, player_turn = process_game_events(
+                is_dragging, start_cell, current_cells, player_turn, game_phase = process_game_events(
                     event, mouse_x, mouse_y, left_grid_x, left_grid_y, right_grid_x,
                     right_grid_y, grid_size, cell_size, player_grid, computer_grid,
                     current_cells, is_dragging, start_cell, SHIPS_TO_PLACE, player_turn, game_phase)

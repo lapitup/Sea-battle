@@ -60,7 +60,7 @@ def process_game_events(event, mouse_x, mouse_y, left_grid_x,left_grid_y, right_
                         #     process_shot(player_grid, computer_cell)
         elif event.button == 3:  # Правый клик - удаление корабля
             if game_phase != 'placing':
-                return is_dragging, start_cell, current_cells, player_turn
+                return is_dragging, start_cell, current_cells, player_turn, game_phase
             cell = get_cell(mouse_x, mouse_y, left_grid_x, left_grid_y, grid_size, cell_size)
             if cell:
                 row, col = cell
@@ -129,4 +129,4 @@ def process_game_events(event, mouse_x, mouse_y, left_grid_x,left_grid_y, right_
             is_dragging = False
             start_cell = None
             current_cells = []
-    return is_dragging, start_cell, current_cells, player_turn
+    return is_dragging, start_cell, current_cells, player_turn, game_phase
