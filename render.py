@@ -67,6 +67,6 @@ def render_game(screen, left_grid_x, left_grid_y, right_grid_x, right_grid_y,gri
 def draw_game_over(screen, player_wins):
     font = pygame.font.Font(None, 74)
     text = 'ВЫ ПОБЕДИЛИ!' if player_wins else 'КОМПЬЮТЕР ПОБЕДИЛ!'
-    color = (255, 255, 255) if player_wins else (255, 255, 255)
+    color = (0, 255, 0) if player_wins else (255, 0, 0)
     label = font.render(text, True, color)
     screen.blit(label, (SCREEN_WIDTH // 2 - label.get_width() // 2, SCREEN_HEIGHT // 2))
