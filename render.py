@@ -147,10 +147,10 @@ def draw_exit_confirm(screen, message = 'Выйти в главное меню?'
     screen.blit(yes_text, (yes_rect.x + 45, yes_rect.y + 12))
 
     no_rect = pygame.Rect(box_x + 230, box_y + 120, 120, 50)
-    no_color = (100, 255, 100) if yes_rect.collidepoint(mouse) else (50, 200, 50)
+    no_color = (100, 255, 100) if no_rect.collidepoint(mouse) else (50, 200, 50)
     no_text = font_s.render('Нет!', True, (255, 255, 255))
     pygame.draw.rect(screen, no_color, no_rect, border_radius=10)
-    screen.blit(no_text, (no_rect.x + 45, no_rect.y + 12))
+    screen.blit(no_text, (no_rect.x + 40, no_rect.y + 12))
 
 
     return yes_rect, no_rect

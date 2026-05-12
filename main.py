@@ -54,11 +54,12 @@ def main():
                 in_menu = process_menu_events(event, mouse_x, mouse_y, in_menu)
 
             else:
-                is_dragging, start_cell, current_cells, player_turn, game_phase, show_enemy_ships = process_game_events(
-                    event, mouse_x, mouse_y, left_grid_x, left_grid_y, right_grid_x,
-                    right_grid_y, grid_size, cell_size, player_grid, computer_grid,
-                    current_cells, is_dragging, start_cell, SHIPS_TO_PLACE, player_turn
-                    , game_phase, show_enemy_ships)
+                if not show_exit_confirm:
+                    is_dragging, start_cell, current_cells, player_turn, game_phase, show_enemy_ships = process_game_events(
+                        event, mouse_x, mouse_y, left_grid_x, left_grid_y, right_grid_x,
+                        right_grid_y, grid_size, cell_size, player_grid, computer_grid,
+                        current_cells, is_dragging, start_cell, SHIPS_TO_PLACE, player_turn
+                        , game_phase, show_enemy_ships)
                 if not player_turn:
                     computer_turn_timer = current_time + computer_turn_delay
                     computer_move_ready = False
@@ -108,7 +109,7 @@ def main():
             shot_animations[:] = [a for a in shot_animations if a.active]
 
             if show_exit_confirm:
-                draw_exit_confirm(screen, 'test')
+                draw_exit_confirm(screen, 'Выйти из игры?')
 
             if game_phase == 'battle':
                 if is_game_over(computer_grid) or is_game_over(player_grid):
