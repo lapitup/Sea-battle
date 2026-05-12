@@ -221,7 +221,7 @@ def mark_surrounding_cells(grid, ships_cells):
 
 def computer_turn(player_grid):
     targets = []
-    # 1. проверить есть ли подбитые, но не унечтоженные корабли
+    # 1. проверить есть ли подбитые, но не уничтоженные корабли
     for r in range(len(player_grid)):
         for c in range(len(player_grid[0])):
             if player_grid[r][c] == 3:
@@ -249,3 +249,28 @@ def is_game_over(grid):
         if 1 in r:
             return False
     return True
+
+def count_remaining_ships(grid):
+    """
+    Подсчитывает количество кораблей, у которых есть хотя бы одна неповрежденная клетка (1).
+    Возвращает словарь {размер_корабля: количество}.
+    """
+    grid_size = len(grid)
+    visited = set()
+    ships_count = {}
+
+    for r in range(grid_size):
+        for c in range(grid_size):
+            # Если клетка часть корабля и мы её еще не считали
+            if grid[r][c] in (1, 3) and (r, c) not in visited:
+                # Находим весь корабль
+                ship_cells = find_ship(grid, (r, c))
+                visited.update(ship_cells)
+
+                # Проверяем, есть ли живые клетки (1)
+                # Если все клетки 3 - корабль убит, не считаем его
+                if any(grid[r][c] == 1 for (r, c) in ship_cells):
+                    size = len(ship_cells)
+                    ships_count[size] = ships_count.get(size, 0) + 1
+
+    return ships_count

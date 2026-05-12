@@ -4,7 +4,7 @@ from settings import SCREEN_WIDTH, SCREEN_HEIGHT, BG_COLOR, get_default_ships
 from menu import draw_menu
 from game import init_player_grid, generate_computer_ships, computer_turn, process_shot, is_game_over, shot_animations
 from events import process_menu_events, process_game_events
-from render import render_game, draw_game_over
+from render import render_game, draw_game_over, draw_exit_confirm
 
 def main():
     pygame.init()
@@ -38,6 +38,7 @@ def main():
     running = True
     player_turn = True
     game_phase = 'placing'
+    show_exit_confirm = False
 
     is_dragging = False
     start_cell = None
@@ -61,6 +62,30 @@ def main():
                 if not player_turn:
                     computer_turn_timer = current_time + computer_turn_delay
                     computer_move_ready = False
+                # обработка выхода в меню
+                if game_phase == 'battle' and show_exit_confirm == False:
+                    if (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and
+                    pygame.Rect(SCREEN_WIDTH - 175, 10, 165, 40).collidepoint(mouse_x, mouse_y)) or \
+                            (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                        show_exit_confirm = True
+
+                if show_exit_confirm:
+                    yes_rect = pygame.Rect(SCREEN_WIDTH // 2 - 175, SCREEN_HEIGHT // 2 + 20, 120, 50)
+                    no_rect = pygame.Rect(SCREEN_WIDTH // 2 + 55, SCREEN_HEIGHT // 2 + 20, 120, 50)
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        if yes_rect.collidepoint(mouse_x, mouse_y):
+                            in_menu = True
+                            show_exit_confirm = False
+                            player_grid = init_player_grid(grid_size)
+                            computer_grid = generate_computer_ships(grid_size)
+                            SHIPS_TO_PLACE = get_default_ships()
+                            player_turn = True
+                            game_phase = 'placing'
+                            is_dragging = False
+                            start_cell = None
+                            current_cells = []
+                        if no_rect.collidepoint(mouse_x, mouse_y):
+                            show_exit_confirm = False
 
         # ход компьютера
         if not in_menu and not player_turn and game_phase == 'battle':
@@ -82,28 +107,26 @@ def main():
                         shot_animations, game_phase, show_enemy_ships)
             shot_animations[:] = [a for a in shot_animations if a.active]
 
-            # if all(count==0 for count in SHIPS_TO_PLACE.values()) and game_phase == 'placing':
-            #     game_phase = 'battle'
-            #     player_turn = True
+            if show_exit_confirm:
+                draw_exit_confirm(screen, 'test')
+
             if game_phase == 'battle':
+                if is_game_over(computer_grid) or is_game_over(player_grid):
+                    in_menu = True
+                    player_grid = init_player_grid(grid_size)
+                    computer_grid = generate_computer_ships(grid_size)
+                    SHIPS_TO_PLACE = get_default_ships()
+                    game_phase = 'placing'
+                    player_turn = True
+                    is_dragging = False
+                    start_cell = None
+                    current_cells = []
 
-
-                if is_game_over(computer_grid):
-                    draw_game_over(screen, player_wins=True)
-                    pygame.display.flip()
-                    pygame.time.wait(3000)
-                    running = False
-
-                elif is_game_over(player_grid):
-                    draw_game_over(screen, player_wins=False)
-                    pygame.display.flip()
-                    pygame.time.wait(3000)
-                    running = False
-
-            font = pygame.font.Font(None, 36)
-            turn_text = 'Ваш ход.' if player_turn else 'Ход компьютера.'
-            turn_label = font.render(turn_text, True, (255, 255, 255))
-            screen.blit(turn_label, (SCREEN_WIDTH//2-turn_label.get_width()//2, 50))
+            if game_phase == 'battle' and not show_exit_confirm:
+                font = pygame.font.Font(None, 36)
+                turn_text = 'Ваш ход.' if player_turn else 'Ход компьютера.'
+                turn_label = font.render(turn_text, True, (255, 255, 255))
+                screen.blit(turn_label, (SCREEN_WIDTH//2-turn_label.get_width()//2, 50))
 
         pygame.display.flip() # Обновление экрана
         clock.tick(60) # Ограничение FPS
